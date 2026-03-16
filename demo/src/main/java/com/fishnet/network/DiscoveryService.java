@@ -55,6 +55,8 @@ public class DiscoveryService {
 
             byte[] buffer = new byte[1024];
 
+            String localIP = InetAddress.getLocalHost().getHostAddress();
+
             while(true){
 
                 DatagramPacket packet =
@@ -64,7 +66,9 @@ public class DiscoveryService {
 
                 String ip = packet.getAddress().getHostAddress();
 
-                peers.add(ip);
+                if(!ip.equals(localIP)){
+                    peers.add(ip);
+                }
 
             }
 
