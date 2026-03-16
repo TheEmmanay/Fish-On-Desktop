@@ -1,0 +1,6 @@
+com\NetworkDiscovery.class
+com\FishFrame.class
+com\Main.class
+com\FishPanel.class
+com\DiscoveryServer.class
+com\SocketManager.class
