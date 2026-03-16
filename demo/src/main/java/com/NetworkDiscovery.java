@@ -3,6 +3,9 @@ package com;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 public class NetworkDiscovery {
 
@@ -10,39 +13,70 @@ public class NetworkDiscovery {
 
         try {
 
+            String myIp = NetworkUtils.getLocalIp();
+
             DatagramSocket socket = new DatagramSocket();
             socket.setBroadcast(true);
 
             byte[] sendData = "DISCOVER_FISH".getBytes();
 
-            DatagramPacket sendPacket =
-                    new DatagramPacket(
-                            sendData,
-                            sendData.length,
-                            InetAddress.getByName("255.255.255.255"),
-                            8888);
+            Enumeration<NetworkInterface> interfaces =
+                    NetworkInterface.getNetworkInterfaces();
 
-            System.out.println("Enviando broadcast de descubrimiento");
+            while (interfaces.hasMoreElements()) {
 
-            socket.send(sendPacket);
+                NetworkInterface ni = interfaces.nextElement();
+
+                if (!ni.isUp() || ni.isLoopback() || ni.isVirtual())
+                    continue;
+
+                String name = ni.getName().toLowerCase();
+
+                if (name.contains("docker")
+                        || name.contains("vbox")
+                        || name.contains("vmnet")
+                        || name.contains("wsl")
+                        || name.contains("tun")
+                        || name.contains("tap"))
+                    continue;
+
+                for (InterfaceAddress addr : ni.getInterfaceAddresses()) {
+
+                    InetAddress broadcast = addr.getBroadcast();
+
+                    if (broadcast == null)
+                        continue;
+
+                    DatagramPacket packet =
+                            new DatagramPacket(
+                                    sendData,
+                                    sendData.length,
+                                    broadcast,
+                                    8888);
+
+                    socket.send(packet);
+
+                }
+            }
 
             socket.setSoTimeout(2000);
 
             byte[] buffer = new byte[1024];
 
-            DatagramPacket receivePacket =
+            DatagramPacket response =
                     new DatagramPacket(buffer, buffer.length);
 
-            socket.receive(receivePacket);
+            socket.receive(response);
 
-            String ip =
-                    receivePacket.getAddress().getHostAddress();
-
-            System.out.println("Respuesta discovery desde " + ip);
+            String foundIp =
+                    response.getAddress().getHostAddress();
 
             socket.close();
 
-            return ip;
+            if (foundIp.equals(myIp))
+                return null;
+
+            return foundIp;
 
         }
         catch (Exception e) {

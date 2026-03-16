@@ -23,36 +23,35 @@ public class NetworkUtils {
 
                 String name = ni.getName().toLowerCase();
 
-                if (name.contains("docker") ||
-                    name.contains("vbox") ||
-                    name.contains("vmnet") ||
-                    name.contains("wsl") ||
-                    name.contains("tun") ||
-                    name.contains("tap"))
+                if (name.contains("docker")
+                        || name.contains("vbox")
+                        || name.contains("vmnet")
+                        || name.contains("wsl")
+                        || name.contains("tun")
+                        || name.contains("tap"))
                     continue;
 
-                Enumeration<InetAddress> addresses = ni.getInetAddresses();
+                Enumeration<InetAddress> addresses =
+                        ni.getInetAddresses();
 
                 while (addresses.hasMoreElements()) {
 
                     InetAddress addr = addresses.nextElement();
 
                     if (addr instanceof Inet4Address &&
-                        !addr.isLoopbackAddress()) {
+                            !addr.isLoopbackAddress()) {
 
                         return addr.getHostAddress();
+
                     }
-
                 }
-
             }
 
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        catch (Exception ignored) {}
 
         return null;
+
     }
 
 }
