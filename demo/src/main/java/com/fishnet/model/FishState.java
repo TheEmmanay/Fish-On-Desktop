@@ -9,7 +9,7 @@ public class FishState implements Serializable {
     public int dx;
     public int dy;
 
-    public FishState(int x, int y, int dx, int dy) {
+    public FishState(int x,int y,int dx,int dy){
         this.x = x;
         this.y = y;
         this.dx = dx;

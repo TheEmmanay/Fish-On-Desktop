@@ -1,14 +1,15 @@
 package com.fishnet.animation;
 
 import com.fishnet.model.FishState;
-import com.fishnet.network.SocketClient;
 import com.fishnet.ui.FishWindow;
 
 import javax.swing.*;
+import java.util.function.Consumer;
 
 public class FishAnimator {
 
     private FishWindow window;
+    private Consumer<FishState> onExit;
 
     private int x = 100;
     private int y = 100;
@@ -18,13 +19,9 @@ public class FishAnimator {
 
     private Timer timer;
 
-    private SocketClient client;
-
-    public FishAnimator(FishWindow window, SocketClient client) {
-
+    public FishAnimator(FishWindow window, Consumer<FishState> onExit) {
         this.window = window;
-        this.client = client;
-
+        this.onExit = onExit;
         timer = new Timer(16, e -> update());
     }
 
@@ -43,28 +40,23 @@ public class FishAnimator {
         int fw = window.getFishWidth();
         int fh = window.getFishHeight();
 
-        if (y <= 0 || y + fh >= h) {
-            dy = -dy;
-        }
+        if(y <= 0 || y + fh >= h) dy = -dy;
+        if(x <= 0) dx = -dx;
 
-        if (x <= 0) {
-            dx = -dx;
-        }
-
-        if (x + fw >= w) {
+        if(x + fw >= w){
 
             FishState state = new FishState(0, y, dx, dy);
 
-            client.sendFish(state);
+            onExit.accept(state);
 
             timer.stop();
-
             window.dispose();
 
             return;
         }
 
-        window.updatePosition(x, y);
+        window.updatePosition(x,y);
+
     }
 
 }

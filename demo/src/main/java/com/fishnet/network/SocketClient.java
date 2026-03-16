@@ -1,33 +1,34 @@
 package com.fishnet.network;
 
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-
 import com.fishnet.model.FishState;
+
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 public class SocketClient {
 
     private String peerIP;
 
-    public SocketClient(String peerIP) {
+    public SocketClient(String peerIP){
         this.peerIP = peerIP;
     }
 
-    public void sendFish(FishState state) {
+    public void sendFish(FishState state){
 
-        try {
+        try{
 
-            Socket socket = new Socket(peerIP, 5000);
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(peerIP,5000),1000);
 
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectOutputStream out =
+                    new ObjectOutputStream(socket.getOutputStream());
 
             out.writeObject(state);
 
             socket.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        }catch(Exception ignored){}
 
     }
 

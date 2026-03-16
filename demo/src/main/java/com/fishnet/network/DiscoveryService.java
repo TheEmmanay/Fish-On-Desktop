@@ -1,80 +1,76 @@
 package com.fishnet.network;
 
-import java.net.Inet4Address;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.NetworkInterface;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DiscoveryService {
 
-    public static List<String> discoverPeers() {
+    private static final int PORT = 8888;
 
-        List<String> peers = new ArrayList<>();
+    private Set<String> peers = new HashSet<>();
 
-        try {
+    public Set<String> getPeers(){
+        return peers;
+    }
 
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+    public void start(){
+        new Thread(this::listen).start();
+        new Thread(this::broadcast).start();
+    }
 
-            while (interfaces.hasMoreElements()) {
+    private void broadcast(){
 
-                NetworkInterface ni = interfaces.nextElement();
+        try{
 
-                if (!ni.isUp() || ni.isLoopback() || ni.isVirtual())
-                    continue;
+            DatagramSocket socket = new DatagramSocket();
+            socket.setBroadcast(true);
 
-                if (ni.getName().contains("docker") ||
-                    ni.getName().contains("veth") ||
-                    ni.getName().contains("wsl"))
-                    continue;
+            byte[] data = "FISH_DISCOVERY".getBytes();
 
-                Enumeration<InetAddress> addresses = ni.getInetAddresses();
+            DatagramPacket packet =
+                    new DatagramPacket(data,data.length,
+                            InetAddress.getByName("255.255.255.255"),PORT);
 
-                while (addresses.hasMoreElements()) {
+            while(true){
 
-                    InetAddress addr = addresses.nextElement();
-
-                    if (addr instanceof Inet4Address) {
-
-                        String ip = addr.getHostAddress();
-
-                        String subnet = ip.substring(0, ip.lastIndexOf("."));
-
-                        for (int i = 1; i < 255; i++) {
-
-                            String target = subnet + "." + i;
-
-                            if (target.equals(ip))
-                                continue;
-
-                            try {
-
-                                Socket s = new Socket();
-
-                                s.connect(new InetSocketAddress(target, 5000), 50);
-
-                                peers.add(target);
-
-                                s.close();
-
-                            } catch (Exception ignored) {}
-
-                        }
-
-                    }
-
-                }
+                socket.send(packet);
+                Thread.sleep(3000);
 
             }
 
-        } catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
 
-        return peers;
+    }
+
+    private void listen(){
+
+        try{
+
+            DatagramSocket socket = new DatagramSocket(PORT);
+
+            byte[] buffer = new byte[1024];
+
+            while(true){
+
+                DatagramPacket packet =
+                        new DatagramPacket(buffer,buffer.length);
+
+                socket.receive(packet);
+
+                String ip = packet.getAddress().getHostAddress();
+
+                peers.add(ip);
+
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
     }
 

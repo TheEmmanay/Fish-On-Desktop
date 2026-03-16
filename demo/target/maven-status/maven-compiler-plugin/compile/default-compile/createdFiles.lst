@@ -1,5 +1,4 @@
 com\fishnet\network\DiscoveryService.class
-com\fishnet\network\PeerConnection.class
 com\fishnet\network\SocketClient.class
 com\fishnet\model\FishState.class
 com\fishnet\Main.class
