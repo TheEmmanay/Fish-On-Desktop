@@ -3,4 +3,5 @@ com\FishFrame.class
 com\Main.class
 com\FishPanel.class
 com\DiscoveryServer.class
+com\NetworkUtils.class
 com\SocketManager.class

@@ -8,9 +8,9 @@ public class Main {
 
         new Thread(new DiscoveryServer()).start();
 
-        String ip = null;
+        System.out.println("Buscando dispositivos en la red...");
 
-        System.out.println("Buscando otro dispositivo en la red...");
+        String ip = null;
 
         while (ip == null) {
 
@@ -18,10 +18,8 @@ public class Main {
 
             if (ip == null) {
 
-                System.out.println("No se encontró dispositivo. Reintentando...");
-
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1500);
                 } 
                 catch (InterruptedException e) {
                     e.printStackTrace();
@@ -33,7 +31,17 @@ public class Main {
 
         System.out.println("Dispositivo encontrado: " + ip);
 
-        String mode = "client";
+        String localIp = NetworkUtils.getLocalIp();
+
+        System.out.println("Mi IP local: " + localIp);
+        String mode;
+
+        if(localIp.compareTo(ip) < 0)
+            mode = "server";
+        else
+            mode = "client";
+
+        System.out.println("Modo seleccionado: " + mode);
 
         String finalIp = ip;
 
