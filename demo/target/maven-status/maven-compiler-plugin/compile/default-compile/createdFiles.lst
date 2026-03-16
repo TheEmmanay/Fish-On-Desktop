@@ -1,7 +1,8 @@
-com\NetworkDiscovery.class
-com\FishFrame.class
-com\Main.class
-com\FishPanel.class
-com\DiscoveryServer.class
-com\NetworkUtils.class
-com\SocketManager.class
+com\fishnet\network\DiscoveryService.class
+com\fishnet\network\PeerConnection.class
+com\fishnet\network\SocketClient.class
+com\fishnet\model\FishState.class
+com\fishnet\Main.class
+com\fishnet\animation\FishAnimator.class
+com\fishnet\network\SocketServer.class
+com\fishnet\ui\FishWindow.class
