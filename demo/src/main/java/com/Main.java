@@ -6,24 +6,24 @@ public class Main {
 
     public static void main(String[] args) {
 
-        new Thread(new DiscoveryServer()).start();
+        System.out.println("Iniciando servidor de descubrimiento");
 
-        System.out.println("Buscando dispositivos en la red...");
+        new Thread(new DiscoveryServer()).start();
 
         String ip = null;
 
         while (ip == null) {
+
+            System.out.println("Buscando dispositivos...");
 
             ip = NetworkDiscovery.discover();
 
             if (ip == null) {
 
                 try {
-                    Thread.sleep(1500);
-                } 
-                catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.sleep(2000);
                 }
+                catch (Exception ignored) {}
 
             }
 
@@ -31,17 +31,7 @@ public class Main {
 
         System.out.println("Dispositivo encontrado: " + ip);
 
-        String localIp = NetworkUtils.getLocalIp();
-
-        System.out.println("Mi IP local: " + localIp);
-        String mode;
-
-        if(localIp.compareTo(ip) < 0)
-            mode = "server";
-        else
-            mode = "client";
-
-        System.out.println("Modo seleccionado: " + mode);
+        String mode = "client";
 
         String finalIp = ip;
 

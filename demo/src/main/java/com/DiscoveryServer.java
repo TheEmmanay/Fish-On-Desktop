@@ -1,6 +1,5 @@
 package com;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
@@ -15,6 +14,8 @@ public class DiscoveryServer implements Runnable {
 
             byte[] buffer = new byte[1024];
 
+            System.out.println("DiscoveryServer activo en puerto 8888");
+
             while (true) {
 
                 DatagramPacket packet =
@@ -22,9 +23,14 @@ public class DiscoveryServer implements Runnable {
 
                 socket.receive(packet);
 
-                String msg = new String(packet.getData(), 0, packet.getLength());
+                String msg =
+                        new String(packet.getData(), 0, packet.getLength());
 
                 if (msg.equals("DISCOVER_FISH")) {
+
+                    System.out.println(
+                            "Solicitud discovery desde "
+                                    + packet.getAddress());
 
                     byte[] response = "HERE".getBytes();
 
@@ -42,7 +48,7 @@ public class DiscoveryServer implements Runnable {
             }
 
         }
-        catch (IOException e) {
+        catch (Exception e) {
             e.printStackTrace();
         }
 
