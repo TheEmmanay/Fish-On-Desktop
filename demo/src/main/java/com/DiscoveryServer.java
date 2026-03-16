@@ -6,25 +6,29 @@ import java.net.DatagramSocket;
 
 public class DiscoveryServer implements Runnable {
 
+    private static final String DISCOVERY_MESSAGE = "DISCOVER_DVD";
+
     @Override
     public void run() {
 
-        try {
-
-            DatagramSocket socket = new DatagramSocket(8888);
+        try (DatagramSocket socket = new DatagramSocket(8888)) {
 
             byte[] buffer = new byte[1024];
 
-            while(true) {
+            while (true) {
 
                 DatagramPacket packet =
                         new DatagramPacket(buffer, buffer.length);
 
                 socket.receive(packet);
 
-                String msg = new String(packet.getData()).trim();
+                String msg = new String(
+                        packet.getData(),
+                        0,
+                        packet.getLength()
+                ).trim();
 
-                if(msg.equals("DISCOVER_DVD")) {
+                if (DISCOVERY_MESSAGE.equals(msg)) {
 
                     byte[] response = "HERE".getBytes();
 
@@ -33,16 +37,18 @@ public class DiscoveryServer implements Runnable {
                                     response,
                                     response.length,
                                     packet.getAddress(),
-                                    packet.getPort());
+                                    packet.getPort()
+                            );
 
                     socket.send(responsePacket);
 
                 }
-
             }
 
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
         }
 
     }
